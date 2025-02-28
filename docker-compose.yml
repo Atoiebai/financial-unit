@@ -11,8 +11,8 @@ services:
 
   financial-unit:
     image: financial-unit:0.0.1
-#    build:
-#      dockerfile: Dockerfile
+    build:
+      dockerfile: Dockerfile
     pull_policy: never
 #    platform: linux/amd64
     env_file:
