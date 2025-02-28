@@ -1,3 +1,5 @@
+Swagger по адресу: http://localhost:8080/swagger-ui.html 
+
 Моменты которые можно улучшить
 
 1. Сделать нормальное логирование, с большей детализацией, уровнями и форматом (в идеале направлять логи в какую нибудь систему)
@@ -16,3 +18,86 @@
 
 
 Для запуска проекта достаточно команды docker compose up --build, доступен удаленный дебаг или же можно развернуть локально (profile=local) используя только постгрес из compose файла
+
+
+
+Запросы: 
+1) Создание юзера CREATE USER (При создании первого юзера, требуется отключить security, если ранее не накатывали юзера напрямую в БД через mock_data.sql например), в таком случае запрос будет: 
+
+`   curl --location 'localhost:8080/api/v1/users' \
+   --header 'Content-Type: application/json' \
+   --header 'Cookie: JSESSIONID=06D1A4501B28A844DB7DE79E47F5E98A' \
+   --data '{
+   "username" : "admin",
+   "password" : "admin",
+   "state" : "ACTIVE"
+   }'
+`
+
+В случае если секьюрити остается включенным, запрос должен включать Authorization header
+Если учетная запись islam:islam записана в бд
+Запрос будет следующий: 
+
+`curl --location 'localhost:8080/api/v1/users' \
+--header 'Content-Type: application/json' \
+--header 'Cookie: JSESSIONID=06D1A4501B28A844DB7DE79E47F5E98A; JSESSIONID=BDF0BF25364927E626C0B3C3F0728E13' \
+--header 'Authorization: Basic aXNsYW06aXNsYW0=' \
+--data '{
+    "username" : "admin",
+    "password" : "admin",
+    "state" : "ACTIVE"
+}'`
+
+2) Получение списка юзеров: 
+
+`curl --location 'localhost:8080/api/v1/users' \
+--header 'Content-Type: application/json' \
+--header 'Authorization: Basic aXNsYW06aXNsYW0=' \
+--header 'Cookie: JSESSIONID=06D1A4501B28A844DB7DE79E47F5E98A; JSESSIONID=BDF0BF25364927E626C0B3C3F0728E13' \
+--data ''`
+
+3) Изменение статуса юзера:
+
+`curl --location --request PUT 'localhost:8080/api/v1/users/change-state' \
+--header 'Content-Type: application/json' \
+--header 'Authorization: Basic aXNsYW06aXNsYW0=' \
+--header 'Cookie: JSESSIONID=06D1A4501B28A844DB7DE79E47F5E98A; JSESSIONID=BDF0BF25364927E626C0B3C3F0728E13' \
+--data '{
+    "username" : "admin",
+    "state" : "BLOCKED"
+}'`
+
+4) Изменение пароля юзера: 
+
+`curl --location --request PUT 'localhost:8080/api/v1/users/change-password' \
+--header 'Content-Type: application/json' \
+--header 'Authorization: Basic aXNsYW06aXNsYW0==' \
+--header 'Cookie: JSESSIONID=06D1A4501B28A844DB7DE79E47F5E98A' \
+--data '{
+    "username" : "admin",
+    "newPassword" : "notdmin"
+}'`
+
+5) Создание транзакции 
+
+`curl --location 'http://localhost:8080/api/v1/transactions' \
+   --header 'Content-Type: application/json' \
+   --header 'Authorization: Basic aXNsYW06aXNsYW0=' \
+   --header 'Cookie: JSESSIONID=BDF0BF25364927E626C0B3C3F0728E13' \
+   --data '{
+   "amount" : 100,
+   "type" : "CREDIT"
+   }'`
+
+6) Получение списка транзакций по юзеру (и интервалу дат):
+
+`curl --location --request GET 'http://localhost:8080/api/v1/transactions?from=2023-10-15T14%3A30%3A45&to=2026-10-15T14%3A30%3A44' \
+--header 'Content-Type: application/json' \
+--header 'Authorization: Basic aXNsYW06aXNsYW0=' \
+--header 'Cookie: JSESSIONID=BDF0BF25364927E626C0B3C3F0728E13' \
+--data '{
+"amount" : 100,
+"type" : "CREDIT"
+}'`
+
+

@@ -16,6 +16,8 @@ spring:
     user: ${FLYWAY_DATASOURCE_USER}
     password: ${FLYWAY_DATASOURCE_PASSWORD}
 
+springdoc:
+  override-with-generic-response: false
 
 server:
   port: ${SERVER_PORT}
