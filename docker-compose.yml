@@ -1,0 +1,24 @@
+services:
+  postgres:
+    image: postgres:14
+    platform: linux/amd64
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_USER=user
+      - POSTGRES_DB=database
+
+  financial-unit:
+    image: financial-unit:0.0.1
+#    build:
+#      dockerfile: Dockerfile
+    pull_policy: never
+#    platform: linux/amd64
+    env_file:
+      - .financial-unit-env
+    ports:
+      - '8080:8080'
+    depends_on:
+      - postgres
+
